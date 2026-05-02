@@ -14,7 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      generated_papers: {
+        Row: {
+          answer_key: Json | null
+          course: string | null
+          created_at: string
+          custom_prompt: string | null
+          difficulty: string | null
+          exam_type: string | null
+          id: string
+          input_mode: string
+          marks: number | null
+          previous_paper_input: string | null
+          question_paper: Json
+          subject: string
+          syllabus: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          answer_key?: Json | null
+          course?: string | null
+          created_at?: string
+          custom_prompt?: string | null
+          difficulty?: string | null
+          exam_type?: string | null
+          id?: string
+          input_mode: string
+          marks?: number | null
+          previous_paper_input?: string | null
+          question_paper: Json
+          subject: string
+          syllabus?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          answer_key?: Json | null
+          course?: string | null
+          created_at?: string
+          custom_prompt?: string | null
+          difficulty?: string | null
+          exam_type?: string | null
+          id?: string
+          input_mode?: string
+          marks?: number | null
+          previous_paper_input?: string | null
+          question_paper?: Json
+          subject?: string
+          syllabus?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
