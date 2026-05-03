@@ -55,8 +55,9 @@ export default function Generate() {
   const [extra, setExtra] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusIdx, setStatusIdx] = useState(0);
-  const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState<null | "syllabus" | "previous">(null);
   const [ocrFileName, setOcrFileName] = useState<string | null>(null);
+  const [syllabusFileName, setSyllabusFileName] = useState<string | null>(null);
 
   const toggleQtype = (q: string) => {
     setQtypes((cur) => cur.includes(q) ? cur.filter((x) => x !== q) : [...cur, q]);
@@ -69,12 +70,12 @@ export default function Generate() {
     r.readAsDataURL(file);
   });
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = (target: "syllabus" | "previous") => async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) return toast.error("File must be under 10 MB");
-    setOcrLoading(true);
-    setOcrFileName(file.name);
+    setOcrLoading(target);
+    if (target === "previous") setOcrFileName(file.name); else setSyllabusFileName(file.name);
     try {
       const base64 = await fileToBase64(file);
       const { data, error } = await supabase.functions.invoke("extract-paper", {
@@ -83,13 +84,17 @@ export default function Generate() {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const text = data?.text ?? "";
-      setPreviousPaper((cur) => cur ? `${cur}\n\n${text}` : text);
+      if (target === "syllabus") {
+        setSyllabus((cur) => cur ? `${cur}\n\n${text}` : text);
+      } else {
+        setPreviousPaper((cur) => cur ? `${cur}\n\n${text}` : text);
+      }
       toast.success("Extracted text from your file");
     } catch (err: any) {
       toast.error(err.message || "Failed to extract file");
-      setOcrFileName(null);
+      if (target === "previous") setOcrFileName(null); else setSyllabusFileName(null);
     } finally {
-      setOcrLoading(false);
+      setOcrLoading(null);
       e.target.value = "";
     }
   };
