@@ -40,7 +40,7 @@ FORMATTING RULES (follow strictly so the paper renders cleanly):
 - Keep "number" short: "1", "2", "9 (a)" or just the integer. Do not embed marks inside the text — put marks in the dedicated "marks" field.
 - Section "name" should be short and bold-worthy, e.g. "PART A", "Section B — Long Answer". Put attempt rules in the section "instructions" field.
 - Top-level "instructions" array is for general exam-wide rules (time, calculator allowed, etc.). One rule per array item, no numbering inside the string.
-- Always set "duration" (e.g. "3 Hours") and "totalMarks" on the paper object when known.
+- Always set "duration" (e.g. "3 Hours") and "totalMarks" on the paper object when known.`;
 
 const TOOL = {
   type: "function",
