@@ -56,8 +56,9 @@ export default function Generate() {
   const [loading, setLoading] = useState(false);
   const [statusIdx, setStatusIdx] = useState(0);
   const [ocrLoading, setOcrLoading] = useState<null | "syllabus" | "previous">(null);
-  const [ocrFileName, setOcrFileName] = useState<string | null>(null);
-  const [syllabusFileName, setSyllabusFileName] = useState<string | null>(null);
+  const [ocrProgress, setOcrProgress] = useState<{ current: number; total: number } | null>(null);
+  const [previousFileNames, setPreviousFileNames] = useState<string[]>([]);
+  const [syllabusFileNames, setSyllabusFileNames] = useState<string[]>([]);
 
   const toggleQtype = (q: string) => {
     setQtypes((cur) => cur.includes(q) ? cur.filter((x) => x !== q) : [...cur, q]);
