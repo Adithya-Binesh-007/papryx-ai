@@ -288,21 +288,34 @@ export default function Generate() {
             <div className="glass rounded-2xl p-6">
               <h2 className="font-display text-lg font-semibold mb-4">Syllabus {mode === "syllabus" && <span className="text-destructive">*</span>}</h2>
               <Textarea rows={6} value={syllabus} onChange={(e) => setSyllabus(e.target.value)} placeholder="Paste your syllabus, or upload a PDF / image below…" />
-              <div className="mt-3 flex items-center gap-3">
+              <div className="mt-3 flex flex-wrap items-center gap-3">
                 <label className="cursor-pointer">
-                  <input type="file" accept="application/pdf,image/*" onChange={handleUpload("syllabus")} className="hidden" />
+                  <input type="file" multiple accept="application/pdf,image/*" onChange={handleUpload("syllabus")} className="hidden" />
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-secondary/50 text-sm hover:bg-secondary transition-colors">
                     {ocrLoading === "syllabus" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                    {ocrLoading === "syllabus" ? "Extracting…" : "Upload syllabus PDF or image"}
+                    {ocrLoading === "syllabus"
+                      ? `Extracting${ocrProgress ? ` ${ocrProgress.current}/${ocrProgress.total}` : ""}…`
+                      : "Upload syllabus PDFs or images"}
                   </span>
                 </label>
-                {syllabusFileName && ocrLoading !== "syllabus" && (
-                  <span className="text-xs text-muted-foreground flex items-center gap-2">
-                    <span>{syllabusFileName}</span>
-                    <button onClick={() => { setSyllabusFileName(null); setSyllabus(""); }}><X className="h-3 w-3" /></button>
-                  </span>
+                {syllabusFileNames.length > 0 && ocrLoading !== "syllabus" && (
+                  <button
+                    type="button"
+                    onClick={() => { setSyllabusFileNames([]); setSyllabus(""); }}
+                    className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                  >
+                    <X className="h-3 w-3" /> Clear all
+                  </button>
                 )}
               </div>
+              {syllabusFileNames.length > 0 && (
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {syllabusFileNames.map((n, i) => (
+                    <li key={i} className="text-xs px-2 py-1 rounded-md bg-secondary/60 text-muted-foreground">{n}</li>
+                  ))}
+                </ul>
+              )}
+              <p className="text-xs text-muted-foreground mt-2">Tip: upload one PDF per module to give the AI complete syllabus coverage.</p>
             </div>
           )}
 
