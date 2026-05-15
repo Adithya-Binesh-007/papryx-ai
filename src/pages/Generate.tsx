@@ -215,7 +215,8 @@ export default function Generate() {
         </div>
 
         <div className="space-y-6">
-          {/* Basic */}
+          {/* Basic info — only needed for custom prompt mode (syllabus / previous papers already contain this context) */}
+          {mode === "prompt" && (
           <div className="glass rounded-2xl p-6">
             <h2 className="font-display text-lg font-semibold mb-4">Basic info</h2>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -285,6 +286,7 @@ export default function Generate() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Mode-specific inputs */}
           {(mode === "syllabus" || mode === "syllabus_previous") && (
