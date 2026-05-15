@@ -116,8 +116,8 @@ serve(async (req) => {
       totalMarks, numQuestions, syllabus, previousPaper, customPrompt, additional,
     } = body ?? {};
 
-    if (!subject) {
-      return new Response(JSON.stringify({ error: "Subject is required" }), {
+    if (!subject && !syllabus && !previousPaper && !customPrompt) {
+      return new Response(JSON.stringify({ error: "Provide a syllabus, previous paper, or custom prompt" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

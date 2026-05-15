@@ -112,12 +112,15 @@ export default function Generate() {
   };
 
   const validate = (): string | null => {
-    if (!subject.trim()) return "Subject is required";
+    if (mode === "prompt") {
+      if (!subject.trim()) return "Subject is required";
+      if (!customPrompt.trim()) return "Please enter a custom prompt";
+      if (qtypes.length === 0) return "Pick at least one question type";
+      return null;
+    }
     if (mode === "syllabus" && !syllabus.trim()) return "Please add your syllabus";
     if (mode === "previous" && !previousPaper.trim()) return "Please paste or upload a previous paper";
-    if (mode === "prompt" && !customPrompt.trim()) return "Please enter a custom prompt";
     if (mode === "syllabus_previous" && !syllabus.trim() && !previousPaper.trim()) return "Add a syllabus or previous paper";
-    if (qtypes.length === 0) return "Pick at least one question type";
     return null;
   };
 
@@ -135,7 +138,9 @@ export default function Generate() {
     const stop = startStatusLoop();
     try {
       const payload = {
-        mode, subject, course, modules: modules ? Number(modules) : undefined,
+        mode,
+        subject: subject.trim() || "(infer from provided materials)",
+        course, modules: modules ? Number(modules) : undefined,
         examType, difficulty, questionTypes: qtypes,
         totalMarks: Number(totalMarks) || 100,
         numQuestions: Number(numQuestions) || 10,
@@ -152,8 +157,9 @@ export default function Generate() {
         .from("generated_papers")
         .insert({
           user_id: user.id,
-          title: paper.title || `${subject} ${examType}`,
-          subject, course: course || null,
+          title: paper.title || `${subject || paper.subject || "Question Paper"} ${examType}`,
+          subject: subject || paper.subject || "Auto",
+          course: course || paper.course || null,
           syllabus: syllabus || null,
           previous_paper_input: previousPaper || null,
           custom_prompt: customPrompt || null,
@@ -212,7 +218,8 @@ export default function Generate() {
         </div>
 
         <div className="space-y-6">
-          {/* Basic */}
+          {/* Basic info — only needed for custom prompt mode (syllabus / previous papers already contain this context) */}
+          {mode === "prompt" && (
           <div className="glass rounded-2xl p-6">
             <h2 className="font-display text-lg font-semibold mb-4">Basic info</h2>
             <div className="grid sm:grid-cols-2 gap-4">
@@ -282,6 +289,7 @@ export default function Generate() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Mode-specific inputs */}
           {(mode === "syllabus" || mode === "syllabus_previous") && (
