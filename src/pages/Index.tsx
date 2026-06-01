@@ -87,14 +87,13 @@ export default function Index() {
                 triggerOnView={false}
               />
               <br className="hidden sm:block" />
-              <span className="glow-title">
-                <TypewriterText
-                  text="Question Paper"
-                  speed={55}
-                  startDelay={750}
-                  triggerOnView={false}
-                />
-              </span>
+              <TypewriterText
+                text="Question Paper"
+                speed={55}
+                startDelay={750}
+                triggerOnView={false}
+                className="glow-title"
+              />
               <TypewriterText
                 text=" in Seconds"
                 speed={32}
