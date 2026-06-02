@@ -195,20 +195,44 @@ export default function PaperView() {
                 <section key={si} className="mb-8">
                   <h2 className="font-display text-lg font-bold mb-1">{s.name}</h2>
                   {s.instructions && <p className="text-xs text-muted-foreground italic mb-3">{s.instructions}</p>}
-                  <ol className="space-y-3">
+                  <div className="space-y-4">
                     {s.questions.map((q, qi) => {
-                      const base = (n: unknown) => String(n ?? "").match(/^\d+/)?.[0] ?? "";
+                      const subs = q.sub_questions ?? [];
                       const next = s.questions[qi + 1];
-                      const showOr = next && base(q.number) && base(q.number) === base(next.number);
                       return (
                         <div key={qi}>
-                          <li className="flex gap-3">
-                            <span className="font-semibold w-6 shrink-0">{q.number}.</span>
-                            <span className="flex-1">{q.text}</span>
-                            {q.marks ? <span className="text-muted-foreground shrink-0">[{q.marks}]</span> : null}
-                          </li>
-                          {showOr && (
-                            <div className="my-2 flex items-center gap-3 text-xs font-bold tracking-widest text-muted-foreground">
+                          <div className="flex gap-3">
+                            <span className="font-semibold w-8 shrink-0">{q.number})</span>
+                            <div className="flex-1 space-y-2">
+                              {q.text && (
+                                <div className="flex gap-3">
+                                  <span className="flex-1">{q.text}</span>
+                                  {q.marks && subs.length === 0 ? (
+                                    <span className="text-muted-foreground shrink-0">[{q.marks}]</span>
+                                  ) : null}
+                                </div>
+                              )}
+                              {subs.length > 0 && (
+                                <div className="space-y-1.5">
+                                  {subs.map((sp, si) => {
+                                    const label = sp.label ?? String.fromCharCode(97 + si);
+                                    return (
+                                      <div key={si} className="flex gap-3">
+                                        <span className="font-semibold w-6 shrink-0">{label})</span>
+                                        <span className="flex-1">{sp.text}</span>
+                                        {sp.marks ? (
+                                          <span className="text-muted-foreground shrink-0">[{sp.marks}]</span>
+                                        ) : null}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                              {subs.length === 0 && !q.text ? null : null}
+                            </div>
+                          </div>
+                          {next && q.or_with_next && (
+                            <div className="my-3 flex items-center gap-3 text-xs font-bold tracking-widest text-muted-foreground">
                               <span className="flex-1 h-px bg-border" />
                               OR
                               <span className="flex-1 h-px bg-border" />
@@ -217,7 +241,7 @@ export default function PaperView() {
                         </div>
                       );
                     })}
-                  </ol>
+                  </div>
                 </section>
               ))}
             </article>
