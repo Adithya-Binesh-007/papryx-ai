@@ -27,20 +27,27 @@ Many real exams have "attempt N of M" rules. Examples:
   - CBSE / state board pattern: many sections give choice e.g. "Attempt any 5 out of 7" or "Either / Or" pairs.
 - When the user specifies a paper pattern, an exam type like "KTU", or a previous paper that uses such a structure, REPLICATE it faithfully:
    * Generate the FULL set of questions (e.g. all 8 Part B questions across modules), NOT just the ones to attempt.
-   * Use clear section instructions stating exactly how many to attempt, e.g. "Answer ALL questions" or "Answer ANY ONE question from each module" or "Either (a) or (b)".
-   * For module-grouped sections, label questions with their module (e.g. "Module 1 — Q9 (a)" and "Module 1 — Q9 (b) OR") OR group them under a sub-heading per module inside the section.
-   * For "either/or" pairs, present both options and add an "OR" indicator between them in the question text or section instructions.
+   * Use clear section instructions stating exactly how many to attempt, e.g. "Answer ALL questions" or "Answer ANY ONE question from each module".
+   * For "either/or" main questions, emit BOTH as separate top-level questions (e.g. number "9" and "10") and set "or_with_next": true on the FIRST of the pair so the renderer draws an OR divider between them.
 - The answer key must include answers for EVERY question generated (including the optional alternates), not only the ones meant to be attempted.
 - Keep questions academically sound and exam-appropriate for the subject and course.
 
+SUB-QUESTIONS (IMPORTANT):
+- A main question can have up to 3 sub-parts (a), (b), (c). Use the "sub_questions" array on the question for this — do NOT cram sub-parts into "text" with line breaks.
+- Each sub-part is an object: { "label": "a", "text": "...", "marks": <number> }. Give EACH sub-part its own marks.
+- When a question has sub_questions, leave "text" empty (or use it only for a short shared stem). The total "marks" on the question is optional — sub-part marks should sum to the intended total.
+- If a main question has no sub-parts, put the question in "text" and the marks in "marks".
+
 FORMATTING RULES (follow strictly so the paper renders cleanly):
-- Question text must be plain text. NO markdown — no **bold**, no *italics*, no backticks, no "###" headings, no bullet dashes inside the question.
-- For multi-part questions, put each sub-part on a NEW LINE inside the question text using "\\n", e.g. "(a) State the principle.\\n(b) Derive the equation.\\n(c) Give one application."
-- Use parenthesised lowercase letters "(a) (b) (c)" for sub-parts. Use "OR" on its own line between alternative questions.
-- Keep "number" short: "1", "2", "9 (a)" or just the integer. Do not embed marks inside the text — put marks in the dedicated "marks" field.
-- Section "name" should be short and bold-worthy, e.g. "PART A", "Section B — Long Answer". Put attempt rules in the section "instructions" field.
+- Question text must be plain text. NO markdown — no **bold**, no *italics*, no backticks, no "###" headings, no bullet dashes.
+- "number" is the main question number only — just an integer like "9" or "10". Do NOT include "(a)" inside "number"; sub-parts live in "sub_questions".
+- Do not embed marks inside any text field — always use the dedicated "marks" field on the question or sub-part.
+- Section "name" should be short, e.g. "PART A", "Section B — Long Answer". Put attempt rules in the section "instructions" field.
 - Top-level "instructions" array is for general exam-wide rules (time, calculator allowed, etc.). One rule per array item, no numbering inside the string.
-- Always set "duration" (e.g. "3 Hours") and "totalMarks" on the paper object when known.`;
+- Always set "duration" (e.g. "3 Hours") and "totalMarks" on the paper object when known.
+
+ANSWER KEY:
+- For questions with sub-parts, use answer key entries like number "9a", "9b" so each sub-part has its own answer.`;
 
 const TOOL = {
   type: "function",
