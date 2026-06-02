@@ -30,7 +30,18 @@ function paperToText(paper: QuestionPaper): string {
     out += `\n${s.name}\n`;
     if (s.instructions) out += `${s.instructions}\n`;
     for (const q of s.questions) {
-      out += `${q.number}. ${q.text}${q.marks ? `  [${q.marks}]` : ""}\n`;
+      const subs = q.sub_questions ?? [];
+      if (subs.length > 0) {
+        if (q.text) out += `${q.number}) ${q.text}\n`;
+        else out += `${q.number})\n`;
+        subs.forEach((sp, i) => {
+          const label = sp.label ?? String.fromCharCode(97 + i);
+          out += `   ${label}) ${sp.text}${sp.marks ? `  [${sp.marks}]` : ""}\n`;
+        });
+      } else {
+        out += `${q.number}) ${q.text ?? ""}${q.marks ? `  [${q.marks}]` : ""}\n`;
+      }
+      if (q.or_with_next) out += `\nOR\n\n`;
     }
   }
   return out;
