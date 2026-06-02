@@ -118,7 +118,9 @@ export function downloadPaperPdf(paper: QuestionPaper, answerKey?: AnswerItem[])
 
     // Questions
     doc.setFontSize(10.8);
-    for (const q of section.questions) {
+    const baseNum = (n: unknown) => String(n ?? "").match(/^\d+/)?.[0] ?? "";
+    for (let qi = 0; qi < section.questions.length; qi++) {
+      const q = section.questions[qi];
       const numStr = `${q.number}.`;
       const marksStr = q.marks ? `[${q.marks}]` : "";
       const marksW = marksStr ? doc.getTextWidth(marksStr) + 2 : 0;
@@ -153,6 +155,16 @@ export function downloadPaperPdf(paper: QuestionPaper, answerKey?: AnswerItem[])
         y += 5;
       }
       y += 1.5;
+
+      // "OR" divider between paired sub-questions sharing the same base number (e.g., 9(a) OR 9(b))
+      const next = section.questions[qi + 1];
+      if (next && baseNum(q.number) && baseNum(q.number) === baseNum(next.number)) {
+        y = ensureSpace(doc, y, 8);
+        doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+        doc.text("OR", PAGE_W / 2, y + 2, { align: "center" });
+        doc.setFont("helvetica", "normal"); doc.setFontSize(10.8);
+        y += 6;
+      }
     }
     y += 4;
   }
