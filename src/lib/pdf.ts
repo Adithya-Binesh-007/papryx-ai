@@ -126,17 +126,14 @@ export function downloadPaperPdf(paper: QuestionPaper, answerKey?: AnswerItem[])
 
     // Questions
     doc.setFontSize(10.8);
-    const baseNum = (n: unknown) => String(n ?? "").match(/^\d+/)?.[0] ?? "";
-    for (let qi = 0; qi < section.questions.length; qi++) {
-      const q = section.questions[qi];
-      const numStr = `${q.number}.`;
-      const marksStr = q.marks ? `[${q.marks}]` : "";
-      const marksW = marksStr ? doc.getTextWidth(marksStr) + 2 : 0;
-      const numW = 10; // reserved width for "12."
-      const textW = CONTENT_W - numW - marksW - 2;
+    const numW = 12; // reserved width for "9)" / "10)"
+    const subW = 8;  // indent for "a)" "b)"
 
-      const cleaned = clean(q.text).replace(/\s*\n\s*/g, "\n");
-      // Split by newlines first so sub-parts (a) (b) keep on their own lines
+    const drawLine = (text: string, leftIndent: number, marks: number | undefined, bold = false) => {
+      const marksStr = marks ? `[${marks}]` : "";
+      const marksW = marksStr ? doc.getTextWidth(marksStr) + 2 : 0;
+      const textW = CONTENT_W - leftIndent - marksW - 2;
+      const cleaned = clean(text).replace(/\s*\n\s*/g, "\n");
       const paragraphs = cleaned.split("\n").filter((p) => p.trim().length > 0);
       const allLines: string[] = [];
       paragraphs.forEach((p, pi) => {
@@ -144,34 +141,58 @@ export function downloadPaperPdf(paper: QuestionPaper, answerKey?: AnswerItem[])
         allLines.push(...wrapped);
         if (pi < paragraphs.length - 1) allLines.push("");
       });
-
-      const blockHeight = allLines.length * 5 + 2;
+      const blockHeight = allLines.length * 5 + 1;
       y = ensureSpace(doc, y, blockHeight);
-
-      // Number
-      doc.setFont("helvetica", "bold");
-      doc.text(numStr, MARGIN, y);
-      // First line text
-      doc.setFont("helvetica", "normal");
+      doc.setFont("helvetica", bold ? "bold" : "normal");
       for (let i = 0; i < allLines.length; i++) {
-        if (allLines[i] !== "") doc.text(allLines[i], MARGIN + numW, y);
+        if (allLines[i] !== "") doc.text(allLines[i], MARGIN + leftIndent, y);
         if (i === 0 && marksStr) {
           doc.setFont("helvetica", "bold");
           doc.text(marksStr, PAGE_W - MARGIN, y, { align: "right" });
-          doc.setFont("helvetica", "normal");
+          doc.setFont("helvetica", bold ? "bold" : "normal");
         }
         y += 5;
       }
-      y += 1.5;
+    };
 
-      // "OR" divider between paired sub-questions sharing the same base number (e.g., 9(a) OR 9(b))
+    for (let qi = 0; qi < section.questions.length; qi++) {
+      const q = section.questions[qi];
+      const subs = q.sub_questions ?? [];
+      const hasSubs = subs.length > 0;
+
+      // Number "9)"
+      y = ensureSpace(doc, y, 6);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${q.number})`, MARGIN, y);
+
+      if (hasSubs) {
+        // Optional stem next to number
+        if (q.text && q.text.trim()) {
+          drawLine(q.text, numW, q.marks);
+        } else {
+          y += 5;
+        }
+        // Sub-parts with their own marks
+        subs.forEach((sp, si) => {
+          const label = sp.label ?? String.fromCharCode(97 + si); // a, b, c
+          doc.setFont("helvetica", "bold");
+          y = ensureSpace(doc, y, 6);
+          doc.text(`${label})`, MARGIN + numW, y);
+          drawLine(sp.text, numW + subW, sp.marks);
+        });
+      } else {
+        drawLine(q.text ?? "", numW, q.marks);
+      }
+      y += 2;
+
+      // "OR" divider between alternative main questions
       const next = section.questions[qi + 1];
-      if (next && baseNum(q.number) && baseNum(q.number) === baseNum(next.number)) {
+      if (next && q.or_with_next) {
         y = ensureSpace(doc, y, 8);
-        doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+        doc.setFont("helvetica", "bold"); doc.setFontSize(10.5);
         doc.text("OR", PAGE_W / 2, y + 2, { align: "center" });
         doc.setFont("helvetica", "normal"); doc.setFontSize(10.8);
-        y += 6;
+        y += 7;
       }
     }
     y += 4;
