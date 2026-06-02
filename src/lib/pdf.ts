@@ -1,6 +1,14 @@
 import jsPDF from "jspdf";
 
-export interface PaperQuestion { number: string | number; text: string; marks?: number; type?: string }
+export interface PaperSubQuestion { label?: string; text: string; marks?: number }
+export interface PaperQuestion {
+  number: string | number;
+  text?: string;
+  marks?: number;
+  type?: string;
+  sub_questions?: PaperSubQuestion[];
+  or_with_next?: boolean;
+}
 export interface PaperSection { name: string; instructions?: string; questions: PaperQuestion[] }
 export interface QuestionPaper {
   title: string;
