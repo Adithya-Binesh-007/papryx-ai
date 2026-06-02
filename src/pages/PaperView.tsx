@@ -196,13 +196,27 @@ export default function PaperView() {
                   <h2 className="font-display text-lg font-bold mb-1">{s.name}</h2>
                   {s.instructions && <p className="text-xs text-muted-foreground italic mb-3">{s.instructions}</p>}
                   <ol className="space-y-3">
-                    {s.questions.map((q, qi) => (
-                      <li key={qi} className="flex gap-3">
-                        <span className="font-semibold w-6 shrink-0">{q.number}.</span>
-                        <span className="flex-1">{q.text}</span>
-                        {q.marks ? <span className="text-muted-foreground shrink-0">[{q.marks}]</span> : null}
-                      </li>
-                    ))}
+                    {s.questions.map((q, qi) => {
+                      const base = (n: unknown) => String(n ?? "").match(/^\d+/)?.[0] ?? "";
+                      const next = s.questions[qi + 1];
+                      const showOr = next && base(q.number) && base(q.number) === base(next.number);
+                      return (
+                        <div key={qi}>
+                          <li className="flex gap-3">
+                            <span className="font-semibold w-6 shrink-0">{q.number}.</span>
+                            <span className="flex-1">{q.text}</span>
+                            {q.marks ? <span className="text-muted-foreground shrink-0">[{q.marks}]</span> : null}
+                          </li>
+                          {showOr && (
+                            <div className="my-2 flex items-center gap-3 text-xs font-bold tracking-widest text-muted-foreground">
+                              <span className="flex-1 h-px bg-border" />
+                              OR
+                              <span className="flex-1 h-px bg-border" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </ol>
                 </section>
               ))}
