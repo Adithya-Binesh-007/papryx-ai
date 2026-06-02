@@ -78,12 +78,26 @@ const TOOL = {
                     items: {
                       type: "object",
                       properties: {
-                        number: { type: "string" },
-                        text: { type: "string" },
-                        marks: { type: "number" },
+                        number: { type: "string", description: "Main question number only, e.g. '9' or '10'." },
+                        text: { type: "string", description: "Question text, or a short shared stem when sub_questions is used. Leave empty if all content is in sub_questions." },
+                        marks: { type: "number", description: "Total marks for this question. Optional when sub_questions provide per-part marks." },
                         type: { type: "string" },
+                        or_with_next: { type: "boolean", description: "Set true on the first of an either/or pair so an OR divider is shown before the next question." },
+                        sub_questions: {
+                          type: "array",
+                          description: "Up to 3 sub-parts. Each carries its own marks. Use this instead of embedding (a)/(b) in text.",
+                          items: {
+                            type: "object",
+                            properties: {
+                              label: { type: "string", description: "Lowercase letter like 'a', 'b', 'c'." },
+                              text: { type: "string" },
+                              marks: { type: "number" },
+                            },
+                            required: ["text"],
+                          },
+                        },
                       },
-                      required: ["number", "text"],
+                      required: ["number"],
                     },
                   },
                 },
