@@ -1,7 +1,7 @@
 project_id = "aybsgvnxceuyvnzrjgty"
 
 [functions.generate-paper]
-verify_jwt = false
+verify_jwt = true
 
 [functions.extract-paper]
-verify_jwt = false
+verify_jwt = true
